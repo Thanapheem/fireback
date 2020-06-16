@@ -20,27 +20,15 @@ const config = {
 const firebase = require('firebase');
 firebase.initializeApp(config);
 
-
-/*app.get('/User',(req,res)=>{
-    admin
-    .firestore()
-    .collection('User')
-    .orderBy('name')
-    .get()
-    .then(data => {
-        let User = [];
-        data.forEach(doc=>{
-            User.push({
-                Userid : doc.id,
-                name : doc.data().name,
-                username : doc.data().username,
-                password : doc.data().password
-            });
-        });
-        return res.json(User);
-    })
-    .catch(err=> console.log(err));
-})*/
+  const isEmail = (email) => {
+    const regEx = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    if (email.match(regEx)) return true;
+    else return false ;
+  }
+  const isEmpty=(string)=>{
+      if(string.trim()==='') return true;
+      else return false;
+  }
     const db = admin.firestore();
   app.post('/signup',(req,res)=>{
      const newUser = {
@@ -50,6 +38,18 @@ firebase.initializeApp(config);
         handle  : req.body.handle
        
      };
+
+        let errors = {};
+        if(isEmpty(newUser.email)){
+            errors.email = "Email is empty";
+        }else if (!isEmail(newUser.email)){
+            errors.email = 'type right email pls'
+        }
+        if(isEmpty(newUser.password)) errors.password = "must enter password"
+        if(newUser.password !== newUser.confirmpassword) errors.confirmpassword = 'password not match';
+        if(isEmpty(newUser.handle)) errors.handle = 'Must Enter';
+        if(Object.keys(errors).length>0) return res.status(400).json(errors);
+        //เช็คข้อมูล
     let token,userId;
      db.doc(`/members/${newUser.handle}`).get()
         .then(doc=>{
@@ -88,4 +88,34 @@ firebase.initializeApp(config);
             return res.status(500).json({error : 'boom'});
         })     
     });
+
+    app.post('/login',(req,res)=>{
+        const user = {
+            email : req.body.email,
+            password : req.body.password
+        };
+        let errors = {};
+        if(isEmpty(user.email))errors.email = 'must not empty';
+        if(isEmpty(user.password)) errors.password = "Enter pass";
+        if(Object.keys(errors).length > 0) return res.status(400).json(errors);
+
+        firebase
+        .auth()
+        .signInWithEmailAndPassword(user.email,user.password)
+        .then(data=>{
+            return data.user.getIdToken();
+        })
+        .then(token=>{
+            return res.json({token});
+        })
+        .catch((err)=>{
+            if(err.code === 'auth/wrong-password'){
+                return res.status(403).json({general : 'wrong data,try again'});
+            }else return res.status(500).json({error: err.code});
+            return res.status(500).json({error: err.code});
+        })
+    
+
+
+    })
  exports.api = functions.region('asia-east2').https.onRequest(app);
