@@ -2,7 +2,12 @@ const {admin , db} = require("../config/admin");
 const config = require("../config/conf");
 const {valdsignup,valdlogin} = require("../config/validate");
 const firebase = require('firebase');
+const { generateKeyPair } = require("crypto");
+const {uuid} = require('uuidv4');
+
+
 firebase.initializeApp(config);
+
 
 // Signup = สมัครสมาชิก
     exports.signup =     (req,res)=>{
@@ -84,7 +89,9 @@ firebase.initializeApp(config);
             })
         };
 
-    // อัพรุูปโปรไฟล์
+
+
+    // อัพรุูปโปรไฟล์ ******กำหมัดยังอัพรูปไม่ได้********************
     exports.uploadimage = (req,res) =>{
         const Busboy = require('busboy');
         const path = require('path');
@@ -94,41 +101,49 @@ firebase.initializeApp(config);
 
         let imagename;
         let imageUpload = {};
+        let generatedToken = uuid();
 
-        busboy.on('file',(fieldname,file,filename ,encoding,mimetype)=>{
-            let imagename;
-            let imageUpload = {};
-            console.log(fieldname);
-            console.log(filename);
-            console.log(mimetype);
-            const imageExten = filename.split('.')[filename.split('.').length -1];
-            imagename = `${Math.round(Math.random()*100000000000)}.${imageExten}`;
+        busboy.on('file',(fieldname,file,filename,endcoding,mimetype)=>{
+           console.log(fieldname);
+           console.log(filename);
+           console.log(mimetype);;
+                  
+            const imageExten = filename.split('.')[filename.split('.').length - 1];
+            imagename  = `${Math.round(Math.random()*100000000000)}.${imageExten}`;
             const filepath = path.join(os.tmpdir(),imagename);
             imageUpload = {filepath,mimetype};
             file.pipe(fs.createWriteStream(filepath));
+           
         });
         busboy.on('finish',()=>{
-            admin.storage().bucket().upload(imageUpload.filepath,{
+           
+            admin
+            .storage()
+            .bucket(config.storageBucket)
+            .upload(imageUpload.filepath,{
                 resumable : false,
                 metadata : {
                     metadata : {
-                        contentType : imageUpload.mimetype
+                        contentType : imageUpload.mimetype,
+                        firebaseStorageDownloadTokens : generatedToken
                     }
                 }
             })
             .then(()=>{
-                const imageurl = `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/${imagename}?alt=media`;
+                const imageurl = `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/${imagename}?alt=media&token=${generatedToken}`
                 return db.doc(`/members/${req.user.handle}`).update({imageurl});
             })
-            .then(()=> {
-                return res.json({message : 'upload success'});
-            })
-            .catch(err=>{
-                console.error(err)
-                return res.status(500).json({error:err.code});
-            })
-        })
-        busboy.end(req.rawBody);
+            .then(()=>{
+                return res.json ({message : ' upload success'});
 
-    }
+            })
+            .catch(err =>{
+                console.error(err);
+                return res.status(500).json({error : err.code});
+            });
+
+        });
+       busboy.end(req.rawBody);
+
+    };
     
