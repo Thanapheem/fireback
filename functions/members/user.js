@@ -4,6 +4,7 @@ const {valdsignup,valdlogin} = require("../config/validate");
 const firebase = require('firebase');
 const { generateKeyPair } = require("crypto");
 const {uuid} = require('uuidv4');
+const { user } = require("firebase-functions/lib/providers/auth");
 
 
 firebase.initializeApp(config);
@@ -91,7 +92,7 @@ firebase.initializeApp(config);
 
 
 
-    // อัพรุูปโปรไฟล์ ******กำหมัดยังอัพรูปไม่ได้********************
+    // อัพรุูปโปรไฟล์ *
     exports.uploadimage = (req,res) =>{
         const Busboy = require('busboy');
         const path = require('path');
@@ -146,4 +147,61 @@ firebase.initializeApp(config);
        busboy.end(req.rawBody);
 
     };
+
+//get user detail
+exports.getuserdetail = (req,res) =>{
+    let userData = {};
+    db.doc(`/members/${req.params.handle}`)
+    .get()
+    .then((doc)=>{
+        if (doc.exists){
+            userData.user = doc.data();
+            return db
+                .collection('cattles')
+                .where("userhandle","==",req.params.handle)
+                .orderBy("handle","desc")
+                .get();
+        }else{
+            return res.status(404).json({error : " user not found"})
+        }
+    })
+   
+    .catch((err)=>{
+        console.error(err);
+        return res.status(500).json({error : err.code});
+    })
+}
+//get auth userdetail
+exports.getauthuserdetail = (req,res)=> {
+    let userData = {};
+    db.doc(`/members/${req.user.handle}`)
+    .get()
+    .then((doc)=>{
+        if (doc.exists){
+            userData.credentails = doc.data();
+            return db
+                .collection('likes')
+                .where("userhandle","==",req.user.handle)
+                .get();
+        }
+    }).then(data=>{
+        userData.likes = [];
+        data.forEach(doc=>{
+            userData.likes.push(doc.data());
+        });
+        return res.json(userData);
+    })
     
+    
+        
+    
+    
+    
+    
+    .catch((err)=>{
+        console.error(err);
+        return res.status(500).json({error : err.code });
+    })
+
+
+}

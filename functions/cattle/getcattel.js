@@ -7,7 +7,18 @@ exports.getcattle  = (req,res)=>{
     const cattledata = {
         name : req.body.name,
         detail : req.body.detail,
-        userhandle : req.user.handle
+        type : req.body.type,
+        userhandle : req.user.handle,
+        cattleid : req.body.cattleid,
+        weight : req.body.weight,
+        gender : req.body.gender,
+        spicies : req.body.spicies,
+        price : req.body.price,
+        birthdate : req.body.birthdate,
+        dadname : req.body.dadname,
+        momname : req.body.momname,
+
+        
     };
     
     
