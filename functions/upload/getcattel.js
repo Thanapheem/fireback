@@ -22,7 +22,7 @@ exports.getcattle  = (req,res)=>{
     };
     
     
-    db.collection('cattles')
+    db.collection("product")
     .add(cattledata)
     .then((doc)=>{
         res.json({message : `document ${doc.id} created success`});
