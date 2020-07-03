@@ -13,10 +13,20 @@ firebase.initializeApp(config);
 // Signup = สมัครสมาชิก
     exports.signup =     (req,res)=>{
         const newUser = {
-            email : req.body.email,
+            
+            username : req.body.username,
             password :req.body.password,
             confirmpassword : req.body.confirmpassword,
-            handle  : req.body.handle
+            email : req.body.email,
+            name : req.body.name,
+            lastname : req.body.lastname,
+            gender : req.body.gender,
+            idno : req.body.idno,
+            phone : req.body.phone,
+            address : req.body.address,
+            birthdate : req.body.birthdate
+
+            
         };
         // เช็คการกรอกข้อมูล
         const {valid,errors} = valdsignup(newUser);
@@ -26,10 +36,10 @@ firebase.initializeApp(config);
         //ใส่รูปโปรไฟล์เปล่า ๆ 
         const noimg = 'pf.png';
         
-        db.doc(`/members/${newUser.handle}`).get()
+        db.doc(`/members/${newUser.username}`).get()
             .then(doc=>{
                 if (doc.exists){
-                    return res.status(400).json({handle : 'hd taken'});
+                    return res.status(400).json({username : 'hd taken'});
                 }else {
                     return firebase 
                     .auth().createUserWithEmailAndPassword(newUser.email,newUser.password)
@@ -43,14 +53,21 @@ firebase.initializeApp(config);
             .then(idToken =>{
                 token = idToken ;
                 const userCredentials = {
-                    handle: newUser.handle,
+                    username: newUser.username,
                     email : newUser.email,
+                    name : newUser.name,
+                    lastname : newUser.lastname,
+                    gender :newUser.gender,
+                    idno : newUser.idno,
+                    phone : newUser.phone,
+                    address : newUser.address,
+                    birthdate : newUser.birthdate,
                     createAt: new Date().toISOString(),
                     imageurl : `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/${noimg}?alt=media` ,
                     userId
 
                 };
-                db.doc(`/members/${newUser.handle}`).set(userCredentials);
+                db.doc(`/members/${newUser.username}`).set(userCredentials);
 
             }) 
             .then(()=>{
@@ -132,7 +149,7 @@ firebase.initializeApp(config);
             })
             .then(()=>{
                 const imageurl = `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/${imagename}?alt=media&token=${generatedToken}`
-                return db.doc(`/members/${req.user.handle}`).update({imageurl});
+                return db.doc(`/members/${req.user.username}`).update({imageurl});
             })
             .then(()=>{
                 return res.json ({message : ' upload success'});
@@ -151,15 +168,15 @@ firebase.initializeApp(config);
 //get user detail
 exports.getuserdetail = (req,res) =>{
     let userData = {};
-    db.doc(`/members/${req.params.handle}`)
+    db.doc(`/members/${req.params.username}`)
     .get()
     .then((doc)=>{
         if (doc.exists){
             userData.user = doc.data();
             return db
                 .collection('cattles')
-                .where("userhandle","==",req.params.handle)
-                .orderBy("handle","desc")
+                .where("userusername","==",req.params.username)
+                .orderBy("username","desc")
                 .get();
         }else{
             return res.status(404).json({error : " user not found"})
@@ -174,14 +191,14 @@ exports.getuserdetail = (req,res) =>{
 //get auth userdetail
 exports.getauthuserdetail = (req,res)=> {
     let userData = {};
-    db.doc(`/members/${req.user.handle}`)
+    db.doc(`/members/${req.user.username}`)
     .get()
     .then((doc)=>{
         if (doc.exists){
             userData.credentails = doc.data();
             return db
                 .collection('likes')
-                .where("userhandle","==",req.user.handle)
+                .where("userusername","==",req.user.username)
                 .get();
         }
     }).then(data=>{
@@ -191,13 +208,6 @@ exports.getauthuserdetail = (req,res)=> {
         });
         return res.json(userData);
     })
-    
-    
-        
-    
-    
-    
-    
     .catch((err)=>{
         console.error(err);
         return res.status(500).json({error : err.code });

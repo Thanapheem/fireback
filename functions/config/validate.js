@@ -20,7 +20,7 @@ const isEmail = (email) => {
     if(isEmpty(data.password)) errors.password = "must enter password"
     if(data.password !== data.confirmpassword) 
     errors.confirmpassword = 'password not match';
-    if(isEmpty(data.handle)) errors.handle = 'Must Enter';
+    if(isEmpty(data.username)) errors.username = 'Must Enter';
     return {
       errors, valid : Object.keys(errors).length===0 ? true: false
     };
@@ -35,3 +35,4 @@ const isEmail = (email) => {
     };
 
   };
+

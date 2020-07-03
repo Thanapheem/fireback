@@ -4,7 +4,7 @@ const { database } = require("firebase-admin");
 const { user } = require("firebase-functions/lib/providers/auth");
 exports.showcattle = (req,res)=> {
     db
-        .collection('cattles')
+        .collection('cattle')
         .get()
         .then((data)=>{
             let cattles =[];
@@ -22,8 +22,24 @@ exports.showcattle = (req,res)=> {
             console.error(err);
             res.status(500).json({error: err.code});
         });
+};
 
-    
-
-
-}
+exports.GetoneCattle =(req,res) =>{
+    let cattledata = {};
+    db.doc(`/cattle/${req.params.cowid}`)
+    .get()
+    .then((doc)=>{
+        if(!doc.exists){
+            return res.status(404).json({error : 'Not found Cattle'});
+        }
+        cattledata = doc.data();
+        cattledata.cowid = doc.id
+    })
+    .then((data)=>{
+        return res.json(cattledata)
+    })
+    .catch((err)=>{
+        conslole.error(err);
+        res.status(500).json({error:err.code});
+    })
+} 
