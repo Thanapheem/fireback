@@ -10,29 +10,29 @@ const { uploadacc, editAccss } = require('./upload/uploadaccessories');
 const { getoneProduct, showallproduct } = require('./showproduct/showproduct');
 const { showAcc, showOneAcc } = require('./showproduct/showAcc');
   
-        // user
+        // เกี่ยวกับผู้ใช้
         app.post('/signup',signup,);
         app.post('/login',login);
         app.post('/user/img',Auth,uploadimage);
         app.get('/userdetail',getuserdetail);
         app.get('/user',Auth,getauthuserdetail);
         
-        //get All Sale     
+        //แสดงสินค้าทั้งหมด   
         app.get('/cattles',showcattle);
         app.get('/product',showallproduct);
         app.get('/accessories',showAcc);
         
-        //get one Sale
+        //แสดงสินค้า 1 ชิ้น
         app.get('/getcow/:cowid',Auth,GetoneCattle)
         app.get('/getprd/:productid',Auth,getoneProduct);
         app.get('/getacces/:ACCid',Auth,showOneAcc);
-        //Upload product
+        
+        //อัพโหลดสินค้า
         app.post('/cattle',Auth,getcattle);
         app.post('/uploadproduct',Auth,uploadproduct);
         app.post('/uploadaccessories',Auth,uploadacc);
 
-        
-        //Update Sale Detail
+        //แก้ไขข้อมูลสินค้า
         app.post('/updatecattle/:cowid',Auth,editCattle);
         app.post('/updateprduct/:productid',Auth,editproduct);
         app.post('/updateacc/:ACCid',Auth,editAccss);

@@ -1,5 +1,6 @@
 const {db} = require("../config/admin");
 
+//ผลิตภัณฑ์
 // แสดงสินค้าทั้งหมด
 exports.showallproduct = (req,res)=>{
     db

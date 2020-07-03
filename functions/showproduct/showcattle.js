@@ -2,6 +2,9 @@ const {db} = require("../config/admin");
 const firebase = require('firebase');
 const { database } = require("firebase-admin");
 const { user } = require("firebase-functions/lib/providers/auth");
+
+//ขายโคมีชีวิต
+//แสดงข้อมูลสินค้าทั้หมด
 exports.showcattle = (req,res)=> {
     db
         .collection('cattle')
@@ -13,6 +16,12 @@ exports.showcattle = (req,res)=> {
                   
                     name : doc.data().name,
                     detail : doc.data().detail,
+                    spicies : doc.data().spicies,
+                    weight : doc.data().weight,
+                    gender : doc.data().gender,
+                    spicies : doc.data().spicies,
+                    price : doc.data().price,
+                    birthdate : doc.data().birthdate,
                     userhandle : doc.data().userhandle
                 });
             }) ;
@@ -24,6 +33,7 @@ exports.showcattle = (req,res)=> {
         });
 };
 
+//แสดงข้อมูลสินค้า 1 ช้้น
 exports.GetoneCattle =(req,res) =>{
     let cattledata = {};
     db.doc(`/cattle/${req.params.cowid}`)

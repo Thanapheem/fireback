@@ -1,5 +1,7 @@
 const {db} = require("../config/admin");
 
+//สินค้าเบ็ดเตล็ด
+//แสดงทั้งหมด
 exports.showAcc =(req,res)=>{
     db.
     collection('accessories')
@@ -25,6 +27,7 @@ exports.showAcc =(req,res)=>{
     });
 }
 
+//แสดง 1 อย่าง
 exports.showOneAcc = (req,res)=>{
     let Accdata ={};
     db.doc(`/accessories/${req.params.ACCid}`)

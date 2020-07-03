@@ -165,7 +165,7 @@ firebase.initializeApp(config);
 
     };
 
-//get user detail
+//แสดงข้อมูลผู่้ใช้ (น่าจะผิด)
 exports.getuserdetail = (req,res) =>{
     let userData = {};
     db.doc(`/members/${req.params.username}`)
@@ -188,7 +188,7 @@ exports.getuserdetail = (req,res) =>{
         return res.status(500).json({error : err.code});
     })
 }
-//get auth userdetail
+//ใช้ไม่ได้
 exports.getauthuserdetail = (req,res)=> {
     let userData = {};
     db.doc(`/members/${req.user.username}`)
