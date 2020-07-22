@@ -1,7 +1,7 @@
 const {db} = require("../config/admin");
 
 
-//ลงทะเบียนโค
+//ลงทะเบียนโคสู่ระบบ
 exports.getcattle  = (req,res)=>{
     const cattledata = {
         name : req.body.name,
@@ -14,11 +14,13 @@ exports.getcattle  = (req,res)=>{
         spicies : req.body.spicies,
         price : req.body.price,
         birthdate : req.body.birthdate,
+        age : req.body.age,
         dadname : req.body.dadname,
         momname : req.body.momname,
         createAt: new Date().toISOString() 
     };
-    db.collection("cattle")
+
+    db.collection("cattle") // เพิ่มข้อมูลไปที่ collection cattle ใน firebase
     .add(cattledata)
     .then((doc)=>{
         const resCattle = cattledata;
@@ -26,7 +28,9 @@ exports.getcattle  = (req,res)=>{
         res.json(resCattle);
     })
     .catch((err)=>{
-        res.status(500).json({error : 'get wrong'});
+        res.status(500).json({errors : 'get wrong'});
+        console.log(err);
+         //แจ้ง error
     })
 
 }

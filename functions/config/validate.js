@@ -13,14 +13,14 @@ const isEmail = (email) => {
   exports.valdsignup =(data) =>{
     let errors = {};
     if(isEmpty(data.email)){
-        errors.email = "Email is empty";
+        errors.email = "กรอกอีเมล์ให้ครบถ้วน";
     }else if (!isEmail(data.email)){
-        errors.email = 'type right email pls'
+        errors.email = 'กรอกอีเมล์ให้ถูกต้อง'
     }
-    if(isEmpty(data.password)) errors.password = "must enter password"
+    if(isEmpty(data.password)) errors.password = "กรุณากรอกรหัสผ่าน"
     if(data.password !== data.confirmpassword) 
-    errors.confirmpassword = 'password not match';
-    if(isEmpty(data.username)) errors.username = 'Must Enter';
+    errors.confirmpassword = 'รหัสผ่านไม่ถูกต้อง';
+    if(isEmpty(data.username)) errors.username = 'กรอกชื่อผู้ใช้';
     return {
       errors, valid : Object.keys(errors).length===0 ? true: false
     };
@@ -28,8 +28,8 @@ const isEmail = (email) => {
  
   exports.valdlogin = (user)=>{
     let errors = {};
-    if(isEmpty(user.email))errors.email = 'must not empty';
-    if(isEmpty(user.password)) errors.password = "Enter pass";
+    if(isEmpty(user.email))errors.email = 'กรอกอีเมล์';
+    if(isEmpty(user.password)) errors.password = "กรอกรหัสผ่าน";
     return {
       errors, valid : Object.keys(errors).length===0 ? true: false
     };

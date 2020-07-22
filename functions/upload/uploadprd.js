@@ -1,6 +1,6 @@
 const {db} = require("../config/admin");
 
-
+// ผลิตภัณฑ์จากโค
 exports.uploadproduct = (req,res) =>{
     const newProduct = {
         prdname : req.body.prdname,
@@ -9,7 +9,8 @@ exports.uploadproduct = (req,res) =>{
         prddate : req.body.prddate,
         expdate : req.body.expdate,
         prdamount : req.body.prddate,
-        prdweight : req.body.prdweight
+        prdweight : req.body.prdweight,
+        createAt: new Date().toISOString() 
     };
     db.collection('product')
     .add(newProduct)
@@ -19,6 +20,7 @@ exports.uploadproduct = (req,res) =>{
         res.json({message : `document ${doc.id} created success`});
     })
     .catch((err)=>{
+        console.error(err);
         res.status(500).json({error : 'get wrong'});
     })
 }

@@ -1,5 +1,6 @@
 const {db} = require("../config/admin");
 
+//สินค้าเบ็ดเตล็ด
 exports.uploadacc = (req,res) =>{
     const newAcc ={
         aName : req.body.aName, 
@@ -8,7 +9,8 @@ exports.uploadacc = (req,res) =>{
         adate : req.body.adate,
         detail : req.body.detail,
         amount : req.body.amount,
-        Weight : req.body.Weight
+        Weight : req.body.Weight,
+        createAt: new Date().toISOString() 
         
     }
     db.collection("accessories")

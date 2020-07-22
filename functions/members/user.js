@@ -5,6 +5,7 @@ const firebase = require('firebase');
 const { generateKeyPair } = require("crypto");
 const {uuid} = require('uuidv4');
 const { user } = require("firebase-functions/lib/providers/auth");
+const { auth } = require("firebase-functions");
 
 
 firebase.initializeApp(config);
@@ -30,8 +31,10 @@ firebase.initializeApp(config);
         };
         // เช็คการกรอกข้อมูล
         const {valid,errors} = valdsignup(newUser);
-        if (!valid) return res.status(400).json(erros);
-        let token,userId;
+        if (!valid) return res.status(400).json(errors);
+        let token,userId,
+           
+
         
         //ใส่รูปโปรไฟล์เปล่า ๆ 
         const noimg = 'pf.png';
@@ -43,13 +46,23 @@ firebase.initializeApp(config);
                 }else {
                     return firebase 
                     .auth().createUserWithEmailAndPassword(newUser.email,newUser.password)
+                    
                 }
         })
+
             .then(data => {
                 userId = data.user.uid;
                 return data.user.getIdToken();
 
             })  
+            .then(auth =>{
+                firebase.storage().ref('/profileImg'+userId+'/profileImage.jpg').put(file).then(function (){
+                    console.log('Upload success');
+                })
+                .catch(err =>{
+                    console.log(error.message);
+                })
+            })
             .then(idToken =>{
                 token = idToken ;
                 const userCredentials = {
@@ -89,7 +102,7 @@ firebase.initializeApp(config);
                 password : req.body.password
             };
             const {valid,errors} = valdlogin(user);
-            if (!valid) return res.status(400).json(erros);
+            if (!valid) return res.status(400).json(errors);
             firebase
             .auth()
             .signInWithEmailAndPassword(user.email,user.password)
@@ -102,8 +115,8 @@ firebase.initializeApp(config);
             .catch((err)=>{
                 if(err.code === 'auth/wrong-password'){
                     return res.status(403).json({general : 'wrong data,try again'});
-                }else return res.status(500).json({error: err.code});
-                return res.status(500).json({error: err.code});
+                }else return res.status(500).json({errors: err.code});
+           
             })
         };
 
@@ -120,7 +133,7 @@ firebase.initializeApp(config);
         let imagename;
         let imageUpload = {};
         let generatedToken = uuid();
-
+        let profileimg = 'profilepicture';
         busboy.on('file',(fieldname,file,filename,endcoding,mimetype)=>{
            console.log(fieldname);
            console.log(filename);
@@ -128,7 +141,7 @@ firebase.initializeApp(config);
                   
             const imageExten = filename.split('.')[filename.split('.').length - 1];
             imagename  = `${Math.round(Math.random()*100000000000)}.${imageExten}`;
-            const filepath = path.join(os.tmpdir(),imagename);
+            const filepath = path.join(os.homedir(),imagename);
             imageUpload = {filepath,mimetype};
             file.pipe(fs.createWriteStream(filepath));
            
@@ -140,6 +153,7 @@ firebase.initializeApp(config);
             .bucket(config.storageBucket)
             .upload(imageUpload.filepath,{
                 resumable : false,
+                destination: `${profileimg}/${imagename}`,
                 metadata : {
                     metadata : {
                         contentType : imageUpload.mimetype,
@@ -174,7 +188,7 @@ exports.getuserdetail = (req,res) =>{
         if (doc.exists){
             userData.user = doc.data();
             return db
-                .collection('cattles')
+                .collection('cattle')
                 .where("userusername","==",req.params.username)
                 .orderBy("username","desc")
                 .get();
@@ -197,14 +211,14 @@ exports.getauthuserdetail = (req,res)=> {
         if (doc.exists){
             userData.credentails = doc.data();
             return db
-                .collection('likes')
+                .collection('cattle')
                 .where("userusername","==",req.user.username)
                 .get();
         }
     }).then(data=>{
-        userData.likes = [];
+        userData.cattle = [];
         data.forEach(doc=>{
-            userData.likes.push(doc.data());
+            userData.cattle.push(doc.data());
         });
         return res.json(userData);
     })
