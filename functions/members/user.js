@@ -13,8 +13,8 @@ firebase.initializeApp(config);
 
 // Signup = สมัครสมาชิก
     exports.signup =     (req,res)=>{
+
         const newUser = {
-            
             username : req.body.username,
             password :req.body.password,
             confirmpassword : req.body.confirmpassword,
@@ -25,20 +25,15 @@ firebase.initializeApp(config);
             idno : req.body.idno,
             phone : req.body.phone,
             address : req.body.address,
-            birthdate : req.body.birthdate
-
-            
+            birthdate : req.body.birthdate,
         };
         // เช็คการกรอกข้อมูล
         const {valid,errors} = valdsignup(newUser);
         if (!valid) return res.status(400).json(errors);
-        let token,userId,
-           
-
+        let token,userId;
         
         //ใส่รูปโปรไฟล์เปล่า ๆ 
         const noimg = 'pf.png';
-        
         db.doc(`/members/${newUser.username}`).get()
             .then(doc=>{
                 if (doc.exists){
@@ -46,23 +41,14 @@ firebase.initializeApp(config);
                 }else {
                     return firebase 
                     .auth().createUserWithEmailAndPassword(newUser.email,newUser.password)
-                    
                 }
         })
-
+        
             .then(data => {
                 userId = data.user.uid;
                 return data.user.getIdToken();
-
-            })  
-            .then(auth =>{
-                firebase.storage().ref('/profileImg'+userId+'/profileImage.jpg').put(file).then(function (){
-                    console.log('Upload success');
-                })
-                .catch(err =>{
-                    console.log(error.message);
-                })
             })
+
             .then(idToken =>{
                 token = idToken ;
                 const userCredentials = {
