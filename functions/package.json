@@ -21,7 +21,7 @@
     "uuidv4": "^6.1.0"
   },
   "devDependencies": {
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "firebase-functions-test": "^0.2.0",
     "redux": "^4.0.5",
     "webpack-node-externals": "^1.7.2"
